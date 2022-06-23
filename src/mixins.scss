@@ -1,0 +1,13 @@
+@mixin font($size, $weight: false, $height: false) {
+    $size-in-rem: $size / 16px * 1rem;
+
+    font-size: $size-in-rem;
+
+    @if $height {
+        line-height: ($height / $size) * $size-in-rem;
+    }
+
+    @if $weight {
+        font-weight: $weight;
+    }
+}

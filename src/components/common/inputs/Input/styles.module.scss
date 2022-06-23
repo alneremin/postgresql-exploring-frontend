@@ -1,0 +1,28 @@
+@import "../../../../mixins.scss";
+@import "../../../../colors.scss";
+
+.input {
+    width: 50%;
+    height: 18px;
+    border: 1px solid $color-gray-light;
+    border-radius: 6px;
+    padding: 10px;
+    
+    // position: relative;
+    margin-left: 10%;
+
+    // display: inline;
+    // margin-top: 7%;
+    // box-sizing: border-box;
+    color: $color-black;
+    @include font(14px);
+
+    &:focus {
+        border-color: $color-green;
+    }
+}
+
+.label {
+    color: $color-white;
+    @include font(16px);
+}

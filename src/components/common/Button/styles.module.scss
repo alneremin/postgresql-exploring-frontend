@@ -1,0 +1,15 @@
+@import "../../../colors.scss";
+@import "../../../mixins.scss";
+
+.button {
+    // width: 100px;
+    height: 40px;
+    border-radius: 5px;
+    margin-left: 1%;    
+    vertical-align:top; 
+    // align-self: center;
+    // margin-top: 7%;
+    color: $color-white;
+    background-color: #1d326f;  
+    @include font(16px);
+}

@@ -1,0 +1,125 @@
+
+.App {
+  /* text-align: center; */
+  background-color: #282c34;
+  min-height: 100vh;
+  
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 100s linear;
+  }
+}
+
+.inline {
+  display: inline;
+}
+
+.block {
+  display: block;
+  padding-top: 50px;
+}
+
+.status-name-label {
+  padding: 5px;
+  font-size: 16px;
+  display:inline-block;
+}
+
+.status-label {
+  color:crimson;
+}
+
+.status {
+  display: inline;
+  color: aliceblue;
+}
+
+.App-header {
+  /* background-color: #282c34; */
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.bottom-buttons {
+  width: 120px;
+  border-radius: 5px;
+  /* margin-left: 1%;     */
+  display: inline;
+  color: white;
+  background-color: #1d326f;  
+}
+
+.bottom-area {
+  position: relative;
+  margin-left: 50%;  
+}
+
+.app-token {
+  /* background-color: #282c34; */
+  max-width: 340px;
+  /* min-height: 10vh; */
+  margin-top: 2%;
+  margin-right: 2%;
+  display: flex;
+  flex-direction: column;
+  align-items: right;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.button-normal-width {
+  width: 7%;
+}
+
+.button-big-width {
+  width: 20%;
+} 
+
+.top {
+  z-index: 1;
+}
+
+.down {
+  z-index: 100;
+}
+
+.App-search {
+  /* background-color: #282c34; */
+  min-height: 5vh;
+  min-width: 50vh;
+  max-width: 100vh;
+  max-height: 10vh;
+  display: "flex";
+  justify-content: center;
+  align-items: "center";
+  /* 
+  
+  align-items: left; */
+  /* justify-content: left; */
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
