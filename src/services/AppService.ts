@@ -1,6 +1,6 @@
 
 import {ApiService} from "./ApiService";
-import {IDatabaseStatusItem, IGetContentItem, ITablesColumns} from "../store/Interfaces";
+import {IDatabaseStatusItem, IMetricItem, ITablesColumns, IExploringResultItem} from "../store/Interfaces";
 
 
 export const AppService = {
@@ -15,6 +15,16 @@ export const AppService = {
 
     async getDatabasesState(query: any): Promise<IDatabaseStatusItem[]> {
         let result = await ApiService.getDatabasesState(query);
+        return result;
+    },
+
+    async getMetrics(query: any): Promise<IMetricItem[]> {
+        let result = await ApiService.getMetrics(query);
+        return result;
+    },
+
+    async getResult(query: any): Promise<IExploringResultItem[]> {
+        let result = await ApiService.getExploringResult(query);
         return result;
     },
 }

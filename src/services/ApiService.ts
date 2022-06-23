@@ -8,9 +8,13 @@ const SERVER_URL_PARAM = constants.config.serverUrl;
 
 const DATABASE_BASE_URL = `${SERVER_URL_PARAM}/api/database`;
 const SETTINGS_BASE_URL = `${SERVER_URL_PARAM}/api/settings`;
+const METRIC_BASE_URL = `${SERVER_URL_PARAM}/api/metric`;
+const RESULT_BASE_URL = `${SERVER_URL_PARAM}/api/result`;
 
 const URL_GET_DATABASES_STATE = `${DATABASE_BASE_URL}`;
+const URL_GET_METRICS = `${METRIC_BASE_URL}`;
 const URL_GET_TABLES = `${SETTINGS_BASE_URL}/tables`;
+const URL_GET_RESULT = `${RESULT_BASE_URL}`;
 
 export const ApiService = {
     TAG: "ApiService",
@@ -21,6 +25,14 @@ export const ApiService = {
 
     async getDatabasesState(query: any) {
         return this.__get(URL_GET_DATABASES_STATE, query);
+    },
+    
+    async getMetrics(query: any) {
+        return this.__get(URL_GET_METRICS, query);
+    },
+
+    async getExploringResult(query: any) {
+        return this.__get(URL_GET_RESULT, query);
     },
 
     //==================================================================================================================

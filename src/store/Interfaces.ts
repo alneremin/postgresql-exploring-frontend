@@ -16,6 +16,21 @@ export interface IDatabaseStatusItem {
   status: String,
 }
 
+export interface IMetricItem {
+  id: String,
+  name: String,
+  type: String,
+}
+
+export interface IExploringResultItem {
+  databaseId: String,
+  metricId: String,
+  databaseName: String,
+  metricName: String,
+  createDate: String,
+  metricValue: String,
+}
+
 export interface IGetContentItem {
   data: String,
   type: String,
@@ -64,6 +79,12 @@ export interface ITableColumnHeader {
 
 export interface IListElement {
   index: number;
+  isChecked: boolean;
+  name: string;
+}
+
+export interface IMetricListElement {
+  id: string;
   isChecked: boolean;
   name: string;
 }

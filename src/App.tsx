@@ -4,7 +4,7 @@ import Button from './components/common/Button';
 import { useInput } from "./utils/hooks";
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 // import { Document, Page } from 'react-pdf';
-import { IListElement, IDatabaseStatusItem, ITablesColumns } from "./store/Interfaces";
+import { IListElement, IDatabaseStatusItem, ITablesColumns, IMetricItem, IMetricListElement, IExploringResultItem } from "./store/Interfaces";
 import { Log } from "./utils/log";
 
 import Input from './components/common/inputs/Input';
@@ -19,7 +19,9 @@ function App() {
 
   const [error, setError] = useState<String>("")
 
-  const searchInput = useInput("")
+  const [searchText, setSearchText] = useState<string>("")
+
+  const [queryText, setQueryText] = useState<string>("")
 
   function setErrorMessage(value: String) {
     setError(value)
@@ -87,7 +89,7 @@ function App() {
   }, [getDatabasesState]);
 
   function getDatabasesStateResponse(value: IDatabaseStatusItem[]) {
-    Log.d4("APP", "TablesResponse", value)
+    Log.d4("APP", "DatabasesStateResponse", value)
     setStateList(value)
   }
 
@@ -148,10 +150,30 @@ function App() {
 
   // let [isCheckedList, setIsCheckedList] = useState(initIsCheckedList);
 
-  const [metricList, setMetricList] = useState<IListElement[]>([{
-    index: 0, isChecked: false, name: 'Время выполнения'},{
-    index: 1, isChecked: false, name: 'Кол-во запросов'},{
-    index: 2, isChecked: false, name: 'Индексирование'},]);
+  const getMetrics = useCallback(async () => {
+    let data = await AppService.getMetrics({})
+        
+    if (data)
+      getMetricsResponse(data)
+    else {
+      setError("Ошибка получения состояний СУБД")
+    }
+  }, [])
+
+  function getMetricsResponse(value: IMetricItem[]) {
+    Log.d4("APP", "MetricResponse", value)
+    setMetricList(value.map(v => {
+      return {
+        id: v.id,
+        isChecked: true,
+        name: v.name
+      } as IMetricListElement
+    }))
+  }
+
+  useEffect(() => { getMetrics() }, [getMetrics]);
+
+  const [metricList, setMetricList] = useState<IMetricListElement[]>([]);
   
   function metricOnChange(index: number) {
     return function metricChecked(e:any) {
@@ -170,6 +192,45 @@ function App() {
   //   // Should not ever set state during rendering, so do this in useEffect instead.
   //   setCompareDbmsList(isCheckedList);
   // }, []);
+
+  const [exploringResult, setExploringResult] = useState<IExploringResultItem[]>([]);
+
+  const getResult = useCallback(async () => {
+
+    const query = {
+      metric: '',
+      query: ''
+    }
+    if (metricList.length) {
+      const metrics = metricList
+      .filter(m => m.isChecked)
+      .map(m => m.id)
+
+      if (metrics.length) {
+        query.metric = metrics.reduce((acc, val) => acc + ';' + val)
+      }
+    }
+
+    if (searchText) {
+      query.query = searchText
+    }
+
+    let data = await AppService.getResult(query)
+        
+    if (data)
+      getResultResponse(data)
+    else {
+      setError("Ошибка получения результата")
+    }
+  }, [metricList, queryText])
+
+  function getResultResponse(value: IExploringResultItem[]) {
+    Log.d4("APP", "ResultResponse", value)
+    setExploringResult(value)
+  }
+
+  useEffect(() => { getResult() }, [getResult]);
+
 
   return (
 
@@ -241,14 +302,13 @@ function App() {
         
         <div className='inline'>
           <Input 
-          onChange={searchInput.onChange}
+          onTextChange={setSearchText}
           placeholder="Введите параметры запроса"/>
           <Button 
           children={"Найти"}
           className='button-normal-width'
           onClick={() => {
-            console.log(metricList)
-            setShowModal(true)
+            setQueryText(searchText)
           }}
           
           />
@@ -280,8 +340,7 @@ function App() {
 
       <Table
       columns={tables?.resultsColumns ?? []}
-      data={[{databaseName: 123, metrics: "124 234 ds gsd gs", checkTime: "12-12-2012 23:23:22", results: "yes"},
-      {databaseName: 312, metrics: "124 234 ds gsd gs", checkTime: "12-12-2012 23:23:22", results: "yes"}]}
+      data={exploringResult}
       viewportWidth={1000}
       viewportHeight={300}
       rowHeight={40}
