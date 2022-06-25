@@ -361,7 +361,7 @@ const Table: React.FunctionComponent<ITableProps> = (props) => {
                 style={{
                     width: "100%",
                     overflowX: "hidden",
-                    overflowY: showHeaderScrollbar ? "scroll" : "hidden"
+                    overflowY: "hidden"
                 }}
                 outerRef={headerRef}
                 columnCount={columns.length}

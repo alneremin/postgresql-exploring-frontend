@@ -4,7 +4,15 @@ import Button from './components/common/Button';
 import { useInput } from "./utils/hooks";
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 // import { Document, Page } from 'react-pdf';
-import { IListElement, IDatabaseStatusItem, ITablesColumns, IMetricItem, IMetricListElement, IExploringResultItem } from "./store/Interfaces";
+import { 
+  IListElement, 
+  IDatabaseStatusItem, 
+  ITablesColumns, 
+  IMetricItem, 
+  IMetricListElement, 
+  IExploringResultItem,
+  ICompareDatabaseItem,
+ } from "./store/Interfaces";
 import { Log } from "./utils/log";
 
 import Input from './components/common/inputs/Input';
@@ -67,9 +75,10 @@ function App() {
   const getDatabasesState = useCallback(async () => {
     let data = await AppService.getDatabasesState({})
         
-    if (data)
+    if (data) {
       getDatabasesStateResponse(data)
-    else {
+      getCompareDbmsResponse(data)
+    } else {
       setError("Ошибка получения состояний СУБД")
     }
   }, [])
@@ -87,6 +96,20 @@ function App() {
 
         return () => clearTimeout(timeout);
   }, [getDatabasesState]);
+
+  useEffect(() => {
+    setError('');
+
+    const timeoutCb = async () => {
+        setError('')
+        clearTimeout(timeout);
+        timeout = setTimeout(timeoutCb, constants.SHOW_ERROR_POLL_TO);
+    };
+
+    let timeout = setTimeout(timeoutCb, constants.SHOW_ERROR_POLL_TO);
+
+    return () => clearTimeout(timeout);
+  }, [setError]);
 
   function getDatabasesStateResponse(value: IDatabaseStatusItem[]) {
     Log.d4("APP", "DatabasesStateResponse", value)
@@ -110,17 +133,24 @@ function App() {
     }
   }
 
-  const [compareDbmsList, setCompareDbmsList] = useState<IListElement[]>([{
-    index: 0, isChecked: true, name: 'MySQL'},{
-    index: 1, isChecked: false, name: 'PostgreSQL'},{
-    index: 2, isChecked: false, name: 'MSSQL'},{
-    index: 3, isChecked: false, name: 'MariaDB'
-  }]);
+  const [compareDbmsList, setCompareDbmsList] = useState<ICompareDatabaseItem[]>([]);
+
+  function getCompareDbmsResponse(value: IDatabaseStatusItem[]) {
+    Log.d4("APP", "CompareDbms", value)
+    setCompareDbmsList(value.map((v, i) => {
+      return {
+        name: v.name,
+        isChecked: compareDbmsList[i] && v.status === 'On' ? compareDbmsList[i].isChecked : false,
+        checkable: v.status === 'On',
+        id: v.id,
+      }
+    }))
+  }
 
   function dbmsOnChange(index: number) {
     return function dbmsChecked(e:any) {
       setCompareDbmsList(compareDbmsList.map((v, i) => {
-        if (index === i) {
+        if (index === i && v.checkable) {
           v.isChecked = true
         } else {
           v.isChecked = false
@@ -130,12 +160,7 @@ function App() {
     }
   }
 
-  const [compareMetricList, setCompareMetricList] = useState<IListElement[]>([{
-    index: 0, isChecked: false, name: 'Время выполнения'},{
-    index: 1, isChecked: false, name: 'Кол-во запросов'},{
-      index: 1, isChecked: false, name: 'Кол-во запросов'},{
-        index: 1, isChecked: false, name: 'Кол-во запросов'},{
-    index: 2, isChecked: false, name: 'Индексирование'},]);
+  const [compareMetricList, setCompareMetricList] = useState<IMetricListElement[]>([]);
 
   function compareMetricOnChange(index: number) {
     return function metricChecked(e:any) {
@@ -169,6 +194,13 @@ function App() {
         name: v.name
       } as IMetricListElement
     }))
+    setCompareMetricList(value.map(v => {
+      return {
+        id: v.id,
+        isChecked: true,
+        name: v.name
+      } as IMetricListElement
+    }))
   }
 
   useEffect(() => { getMetrics() }, [getMetrics]);
@@ -193,7 +225,7 @@ function App() {
   //   setCompareDbmsList(isCheckedList);
   // }, []);
 
-  const [exploringResult, setExploringResult] = useState<IExploringResultItem[]>([]);
+  const [ExploringResult, setExploringResult] = useState<IExploringResultItem[]>([]);
 
   const getResult = useCallback(async () => {
 
@@ -224,6 +256,20 @@ function App() {
     }
   }, [metricList, queryText])
 
+  useEffect(() => {
+    getResult();
+
+    const timeoutCb = async () => {
+        await getResult();
+        clearTimeout(timeout);
+        timeout = setTimeout(timeoutCb, constants.GET_DATABASE_STATE_POLL_TO);
+    };
+
+    let timeout = setTimeout(timeoutCb, constants.GET_DATABASE_STATE_POLL_TO);
+
+    return () => clearTimeout(timeout);
+}, [getResult]);
+
   function getResultResponse(value: IExploringResultItem[]) {
     Log.d4("APP", "ResultResponse", value)
     setExploringResult(value)
@@ -231,62 +277,27 @@ function App() {
 
   useEffect(() => { getResult() }, [getResult]);
 
+  function analyzeDatabaseResponse(value: IExploringResultItem[]) {
+    Log.d4("APP", "analyzeDatabaseResponse", value)
+    setShowModal(false)
+    setExploringResult(value)
+  }
 
   return (
 
     <div className="App">
       
-      <Modal
-        visible={showModal}
-        title={"Выберите СУБД и метрики для сравнения"}
-        content={(
-          <div>
-            <h1 className='status-name-label'>СУБД:</h1>
-            <List
-            checkList={compareDbmsList}
-            menuCLassName={'vmenu'}
-            childrenFunc={(value: IListElement, index, array) => (
-              <li>
-                <span className='status-name-label'>{value.name}</span>
-                <input className='status-label' type='checkbox' onChange={dbmsOnChange(index)} checked={value.isChecked}/>
-              </li>
-            )}
-            />
-
-            <h1 className='status-name-label'>Метрики:</h1>
-            <List
-            checkList={compareMetricList}
-            menuCLassName={'menu-modal'}
-            childrenFunc={(value: IListElement, index, array) => (
-              <li>
-                <span className='status-name-label'>{value.name}</span>
-                <input className='status-label' type='checkbox' onChange={compareMetricOnChange(index)} checked={value.isChecked}/>
-              </li>
-            )}
-            />
-
-            <div className='bottom-area'>
-              <Button 
-              children={"Сравнить"}
-              className={'bottom-buttons'}
-              onClick={() => {
-              }}/>
-              <Button 
-              children={"Закрыть"}
-              className={'bottom-buttons'}
-              onClick={() => {
-                setShowModal(false)
-              }}/>
-            </div>
-          </div>
-        )}
-        footer={(
-         <br/>
-        )}
-        onClose={() => {
-          setShowModal(false)
-        }}
-      />
+      {analyzeModal(
+        showModal, 
+        compareDbmsList,
+        dbmsOnChange,
+        compareMetricList,
+        compareMetricOnChange,
+        setShowModal,
+        setError,
+        analyzeDatabaseResponse,
+        error
+      )}
 
       <div className='block'>
         <List
@@ -295,7 +306,9 @@ function App() {
           childrenFunc={(value: IDatabaseStatusItem, index, array) => (
             <li>
               <span className='status-name-label'>{value.name}</span>
-              <span className='status-label' onChange={stateOnChange(index)}>{": " + value.status} </span>
+              <span 
+              className={value.status === 'On' ? 'status-green-label' : 'status-red-label'} 
+              onChange={stateOnChange(index)}>{": " + value.status} </span>
             </li>
           )}
         />
@@ -313,7 +326,16 @@ function App() {
           
           />
           <Button 
-          children={"Начать сравнение"}
+          children={"Анализ"}
+          className='button-normal-width'
+          onClick={() => {
+            console.log(metricList)
+            setShowModal(true)
+          }}
+          />
+
+          <Button 
+          children={"Сравнить"}
           className='button-big-width'
           onClick={() => {
             console.log(metricList)
@@ -334,13 +356,9 @@ function App() {
       
       </div>
 
-      <header className="App-header">
-        <h3>{error}</h3>
-      </header>
-
       <Table
       columns={tables?.resultsColumns ?? []}
-      data={exploringResult}
+      data={ExploringResult}
       viewportWidth={1000}
       viewportHeight={300}
       rowHeight={40}
@@ -354,10 +372,105 @@ function App() {
       <br/>
       <br/>
       
+      <header className="App-header">
+        <h5>{error}</h5>
+      </header>
+
     </div >
 
   );
 
+}
+
+function analyzeModal(
+  showModal:boolean, 
+  compareDbmsList:ICompareDatabaseItem[],
+  dbmsOnChange:any,
+  compareMetricList:IMetricListElement[],
+  compareMetricOnChange:any,
+  setShowModal:any,
+  setError:any,
+  analyzeDatabaseResponse:any,
+  error:any
+  ) {
+  return (
+    <Modal
+    visible={showModal}
+    title={"Выберите СУБД и метрики для анализа"}
+    content={(
+      <div>
+        <h1 className='status-name-label'>СУБД:</h1>
+        <List
+        checkList={compareDbmsList}
+        menuCLassName={'vmenu'}
+        childrenFunc={(value: ICompareDatabaseItem, index, array) => (
+          <li>
+            <span 
+            className={'status-name-label ' + (value.checkable ? '': 'status-off')} >{value.name}</span>
+            <input className='status-labels'
+            type='checkbox' 
+            onChange={dbmsOnChange(index)} 
+            checked={value.isChecked}/>
+          </li>
+        )}
+        />
+
+        <h1 className='status-name-label'>Метрики:</h1>
+        <List
+        checkList={compareMetricList}
+        menuCLassName={'menu-modal'}
+        childrenFunc={(value: IListElement, index, array) => (
+          <li>
+            <span className='status-name-label'>{value.name}</span>
+            <input className='status-label' type='checkbox' onChange={compareMetricOnChange(index)} checked={value.isChecked}/>
+          </li>
+        )}
+        />
+      </div>
+    )}
+    footer={(
+      <div className='inline'>
+      <div className='status-red-label'>{error}</div>
+      <div className='bottom-area'>
+      <Button 
+      children={"Анализ"}
+      className={'bottom-buttons'}
+      onClick={() => {
+        analyzeDatabase(compareDbmsList, compareMetricList, setError, analyzeDatabaseResponse)
+      }}/>
+      <Button 
+      children={"Закрыть"}
+      className={'bottom-buttons'}
+      onClick={() => {
+        setShowModal(false)
+      }}/>
+    </div>
+    </div>
+    )}
+    onClose={() => {
+      setShowModal(false)
+    }}
+  />
+  )
+}
+
+async function analyzeDatabase(
+  compareDbmsList:ICompareDatabaseItem[],
+  compareMetricList:IMetricListElement[],
+  setError:any,
+  analyzeDatabaseResponse:any
+  ) {
+ 
+    let data = await AppService.analyzeDatabase({
+      metricIds: compareMetricList.filter(m => m.isChecked).map(m => m.id),
+      databaseIds: compareDbmsList.filter(m => m.isChecked).map(m => m.id),
+    })
+   
+    if (data) {
+      analyzeDatabaseResponse(data)
+    } else {
+      setError("Ошибка анализа СУБД")
+    }
 }
 
 export default App;

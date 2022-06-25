@@ -40,12 +40,17 @@
     animation-duration: 0.5s;
   }
   
-  .modal-header,
-  .modal-footer {
+  .modal-header {
     display: flex;
     align-items: center;
     padding: 1rem;
   }
+
+  .modal-footer {
+    align-items: center;
+    padding: 1rem;
+  }
+
   .modal-header {
     border-bottom: 1px solid #dbdbdb;
     justify-content: space-between;

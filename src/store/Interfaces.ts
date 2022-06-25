@@ -14,6 +14,14 @@ export interface IGetContentRequest {
 export interface IDatabaseStatusItem {
   name: String,
   status: String,
+  id: String,
+}
+
+export interface ICompareDatabaseItem {
+  name: String,
+  id: String,
+  isChecked: boolean,
+  checkable: boolean
 }
 
 export interface IMetricItem {
@@ -29,6 +37,12 @@ export interface IExploringResultItem {
   metricName: String,
   createDate: String,
   metricValue: String,
+  status: String,
+}
+
+export interface IAnalyzeDatabaseRequest {
+  metricIds: string[],
+  databaseIds: string[],
 }
 
 export interface IGetContentItem {
