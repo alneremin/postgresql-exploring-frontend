@@ -138,3 +138,11 @@
     transform: rotate(360deg);
   }
 }
+
+.modal-analyze {
+  max-width: 670px;
+}
+
+.modal-compare {
+  max-width: 1000px;
+}

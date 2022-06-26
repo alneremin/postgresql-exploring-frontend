@@ -1,43 +1,58 @@
 export { }
 
 export interface ISearchRegistryItemRequest {
-  surname: String,
-  name: String,
-  patrname: String,
-  birthdate: String
+  surname: string,
+  name: string,
+  patrname: string,
+  birthdate: string
 }
 
 export interface IGetContentRequest {
-  amdId: String,
+  amdId: string,
 }
 
 export interface IDatabaseStatusItem {
-  name: String,
-  status: String,
-  id: String,
+  name: string,
+  status: string,
+  id: string,
 }
 
 export interface ICompareDatabaseItem {
-  name: String,
-  id: String,
+  name: string,
+  id: string,
   isChecked: boolean,
   checkable: boolean
 }
 
 export interface IMetricItem {
-  id: String,
-  name: String,
-  type: String,
+  id: string,
+  name: string,
+  type: string,
+}
+
+export interface IActionItem {
+  id: string,
+  name: string,
 }
 
 export interface IExploringResultItem {
-  databaseId: String,
-  metricId: String,
-  databaseName: String,
-  metricName: String,
-  createDate: String,
-  metricValue: String,
-  status: String,
+  databaseId: string,
+  metricId: string,
+  databaseName: string,
+  metricName: string,
+  createDate: string,
+  metricValue: string,
+  status: string
+}
+
+export interface ICompareResultItem {
+  metric: string,
+  dbms1: string,
+  dbmsId1: string,
+  dbmsName1: string,
+  dbms2: string,
+  dbmsId2: string,
+  dbmsName2: string,
 }
 
 export interface IAnalyzeDatabaseRequest {
@@ -45,9 +60,13 @@ export interface IAnalyzeDatabaseRequest {
   databaseIds: string[],
 }
 
+export interface ICompareDatabaseRequest {
+  databaseIds: string[],
+}
+
 export interface IGetContentItem {
-  data: String,
-  type: String,
+  data: string,
+  type: string,
 }
 
 export enum DialogResultCode {
@@ -83,6 +102,7 @@ export interface ITableColumn {
 
 export interface ITablesColumns {
   resultsColumns: ITableColumn[];
+  compareColumns: ITableColumn[];
 }
 
 export interface ITableColumnHeader {
@@ -98,6 +118,12 @@ export interface IListElement {
 }
 
 export interface IMetricListElement {
+  id: string;
+  isChecked: boolean;
+  name: string;
+}
+
+export interface IActionListElement {
   id: string;
   isChecked: boolean;
   name: string;

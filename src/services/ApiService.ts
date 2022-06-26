@@ -13,9 +13,11 @@ const RESULT_BASE_URL = `${SERVER_URL_PARAM}/api/result`;
 
 const URL_GET_DATABASES_STATE = `${DATABASE_BASE_URL}`;
 const URL_GET_METRICS = `${METRIC_BASE_URL}`;
+const URL_GET_ACTIONS = `${METRIC_BASE_URL}/action`;
 const URL_GET_TABLES = `${SETTINGS_BASE_URL}/tables`;
 const URL_GET_RESULT = `${RESULT_BASE_URL}`;
 const URL_ANALYZE_DATABASE = `${RESULT_BASE_URL}`;
+const URL_COMPARE_DATABASE = `${RESULT_BASE_URL}/compare`;
 
 export const ApiService = {
     TAG: "ApiService",
@@ -32,12 +34,20 @@ export const ApiService = {
         return this.__get(URL_GET_METRICS, query);
     },
 
+    async getActions(query: any) {
+        return this.__get(URL_GET_ACTIONS, query);
+    },
+
     async getExploringResult(query: any) {
         return this.__get(URL_GET_RESULT, query);
     },
 
     async analyzeDatabase(body: any) {
         return this.__post(URL_ANALYZE_DATABASE, body);
+    },
+
+    async compareDatabase(body: any) {
+        return this.__post(URL_COMPARE_DATABASE, body);
     },
 
     //==================================================================================================================

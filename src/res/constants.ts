@@ -2,7 +2,7 @@
 export default {
 
     config: {
-        serverUrl: "http://localhost:8888"
+        serverUrl: "http://localhost:8889" //192.168.0.111
     },
     
     HTTP_SERVICE_TIMEOUT: 30000,

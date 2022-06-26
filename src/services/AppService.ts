@@ -1,6 +1,6 @@
 
 import {ApiService} from "./ApiService";
-import {IDatabaseStatusItem, IMetricItem, ITablesColumns, IExploringResultItem, IAnalyzeDatabaseRequest} from "../store/Interfaces";
+import {IDatabaseStatusItem, IMetricItem, ITablesColumns, IExploringResultItem, IAnalyzeDatabaseRequest, IActionItem, ICompareDatabaseRequest, ICompareResultItem} from "../store/Interfaces";
 
 
 export const AppService = {
@@ -23,6 +23,11 @@ export const AppService = {
         return result;
     },
 
+    async getActions(query: any): Promise<IActionItem[]> {
+        let result = await ApiService.getActions(query);
+        return result;
+    },
+
     async getResult(query: any): Promise<IExploringResultItem[]> {
         let result = await ApiService.getExploringResult(query);
         return result;
@@ -30,6 +35,11 @@ export const AppService = {
 
     async analyzeDatabase(data: any): Promise<IAnalyzeDatabaseRequest[]> {
         let result = await ApiService.analyzeDatabase(data);
+        return result;
+    },
+
+    async compareDatabase(data: ICompareDatabaseRequest): Promise<ICompareResultItem[]> {
+        let result = await ApiService.compareDatabase(data);
         return result;
     },
 }

@@ -3,10 +3,11 @@ import clsx from "clsx";
 import styles from "./styles.module.scss";
 
 export interface IInputProps extends InputHTMLAttributes<any> {
-    value?: string;
+    value?: string | number;
     placeholder?: string;
     inputRef?: any;
     password?: boolean;
+    inputType?: string;
     readOnly?: boolean;
     digitsOnly?: boolean;
     tabIndex?: number;
@@ -30,6 +31,7 @@ const Input: React.FunctionComponent<IInputProps> = (props) => {
         placeholder,
         inputRef,
         password,
+        inputType,
         readOnly,
         digitsOnly,
         tabIndex,
@@ -75,7 +77,7 @@ const Input: React.FunctionComponent<IInputProps> = (props) => {
     const input = (
         <input
             tabIndex={tabIndex || 0}
-            type={password ? "password" : "text"}
+            type={inputType ? inputType : password ? "password" : "text"}
             onClick={onClick}
             ref={inputRef}
             className={clsx(styles.input, className)}

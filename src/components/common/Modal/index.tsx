@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import React, { ReactElement } from 'react'
 import './index.scss'
 
@@ -5,6 +6,7 @@ import './index.scss'
 interface ModalProps {
     visible: boolean
     title: string | undefined
+    className?: string
     content: ReactElement | string
     footer: ReactElement | string
     onClose: () => void
@@ -16,6 +18,7 @@ const Modal: React.FunctionComponent<ModalProps> = (props) => {
         title,
         content,
         footer,
+        className,
         onClose,
     } = props
     // создаем обработчик нажатия клавиши Esc
@@ -39,7 +42,7 @@ const Modal: React.FunctionComponent<ModalProps> = (props) => {
     // или возвращаем верстку модального окна
     return (
         <div className='modal element'>
-            <div className='modal-dialog'>
+            <div className={clsx(className,'modal-dialog')}>
                 <div className='modal-header'>
                     <h3 className='modal-title'>{title}</h3>
                     <span className='modal-close' onClick={onClose}>
