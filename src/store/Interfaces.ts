@@ -47,12 +47,15 @@ export interface IExploringResultItem {
 
 export interface ICompareResultItem {
   metric: string,
-  dbms1: string,
-  dbmsId1: string,
-  dbmsName1: string,
-  dbms2: string,
-  dbmsId2: string,
-  dbmsName2: string,
+  action: string,
+  rowCount: string,
+  dbInfo: IDatabaseInfoItem[],
+}
+
+export interface IDatabaseInfoItem {
+  dbmsValue: string,
+  dbmsId: string,
+  dbmsName: string,
 }
 
 export interface IAnalyzeDatabaseRequest {
@@ -98,6 +101,7 @@ export interface ITableColumn {
   order: number;
   type: string;
   alignLeft?: boolean;
+  hidden?: boolean;
 }
 
 export interface ITablesColumns {

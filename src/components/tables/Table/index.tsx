@@ -127,7 +127,7 @@ const Table: React.FunctionComponent<ITableProps> = (props) => {
         [currentPosition, selection, setSelection, singleSelection, data.length]
     );
 
-    const columnsWidth = useMemo(() => columns.reduce((p, c) => p + c.width, 0), [columns]);
+    const columnsWidth = useMemo(() => columns.reduce((p, c) => p + (c.hidden ? 0 : c.width), 0), [columns]);
 
     const horizontalScrollSize = useMemo(() => columnsWidth / 10, [columnsWidth]);
 
@@ -294,6 +294,7 @@ const Table: React.FunctionComponent<ITableProps> = (props) => {
                         propertyName: columns[cell.columnIndex].propertyName
                     })
                 }
+                hidden={columns[cell.columnIndex].hidden}
             >
                 <div
                     style={{
@@ -335,6 +336,7 @@ const Table: React.FunctionComponent<ITableProps> = (props) => {
                 }
                 onClick={(event) => cellClickHandler(cell.rowIndex, event.ctrlKey)}
                 className={"notSelectableText"}
+                hidden={columns[cell.columnIndex].hidden}
             >
                 {columns[cell.columnIndex].type === constants.TABLE_VALUE_TYPE_BOOL &&
                 data[cell.rowIndex][columns[cell.columnIndex].propertyName] === true
@@ -347,7 +349,7 @@ const Table: React.FunctionComponent<ITableProps> = (props) => {
         [columns, getRowColor, data, cellDoubleClickHandler, cellClickHandler]
     );
 
-    const columnWidthHandler = useCallback((index: number) => columns[index].width, [columns]);
+    const columnWidthHandler = useCallback((index: number) => columns[index].hidden ? 0 : columns[index].width, [columns]);
 
     return (
         <div

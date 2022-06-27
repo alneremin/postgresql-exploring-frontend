@@ -80,8 +80,6 @@ function App() {
         
     if (data) {
       getDatabasesStateResponse(data)
-      getCompareDbmsResponse(data)
-      getCompareListResponse(data)
     } else {
       setError("Ошибка получения состояний СУБД")
     }
@@ -100,6 +98,8 @@ function App() {
 
         return () => clearTimeout(timeout);
   }, [getDatabasesState]);
+
+
 
   useEffect(() => {
     setError('');
@@ -137,6 +137,12 @@ function App() {
     }
   }
 
+  
+useEffect(() => {
+    getCompareDbmsResponse(stateList)
+    getCompareListResponse(stateList)
+}, [stateList]);
+
   const [compareDbmsList, setCompareDbmsList] = useState<ICompareDatabaseItem[]>([]);
 
   function getCompareDbmsResponse(value: IDatabaseStatusItem[]) {
@@ -145,7 +151,7 @@ function App() {
     setCompareDbmsList(value.map((v, i) => {
       return {
         name: v.name,
-        isChecked: compareDbmsList[i] && v.status === 'On' ? compareDbmsList[i].isChecked : false,
+        isChecked: v.status === 'On' ? compareDbmsList[i]?.isChecked ?? true : false,
         checkable: v.status === 'On',
         id: v.id,
       }
@@ -158,9 +164,7 @@ function App() {
       console.log(compareDbmsList)
       setCompareDbmsList(compareDbmsList.map((v, i) => {
         if (index === i && v.checkable) {
-          v.isChecked = true
-        } else {
-          v.isChecked = false
+          v.isChecked = !v.isChecked
         }
         return v
       }))
@@ -341,15 +345,16 @@ function App() {
 
   function compareListOnChange(index: number) {
     return function compareListChecked(e:any) {
-      let checkedCount = !compareList[index].isChecked ? 1 : 0
+      // let checkedCount = !compareList[index].isChecked ? 1 : 0
       setCompareList(compareList.map((v, i) => {
         if (index === i && v.checkable) {
           v.isChecked = !v.isChecked
-        } else if (checkedCount > 1) {
-          v.isChecked = false
-        } else if (v.isChecked) {
-          checkedCount++
-        }
+        } 
+        // else if (checkedCount > 1) {
+        //   v.isChecked = false
+        // } else if (v.isChecked) {
+        //   checkedCount++
+        // }
         return v
       }))
     }
@@ -360,7 +365,7 @@ function App() {
     setCompareList(value.map((v, i) => {
       return {
         name: v.name,
-        isChecked: compareList[i] && v.status === 'On' ? compareList[i].isChecked : false,
+        isChecked: v.status === 'On' ? compareList[i]?.isChecked ?? true : false,
         checkable: v.status === 'On',
         id: v.id,
       }
@@ -396,22 +401,25 @@ function App() {
   function getCompareResultResponse(value: ICompareResultItem[]) {
     Log.d4("APP", "CompareResultResponse", value)
 
-    if (tables?.compareColumns) {
-      const dbms1Number = tables.compareColumns.length - 2
-      tables.compareColumns[dbms1Number].name = value[0].dbmsName1 ??  
-        tables.compareColumns[dbms1Number].name
-        const dbms2Number = tables.compareColumns.length - 1
-      tables.compareColumns[dbms2Number].name = value[0].dbmsName2 ??
-        tables.compareColumns[dbms2Number].name
+    if (tables?.compareColumns && value.length) {
+      for (let i = 0; i < compareList.length; i++) {
+        tables.compareColumns[3 + i] = {
+          name: !value[0]?.dbInfo[i] ? '-' : value[0]?.dbInfo[i]?.dbmsName,
+          propertyName: "dbmsValue" + (i+1),
+          type: "string",
+          width: 175,
+          order: 1,
+          hidden: false
+        }
+     }
     }
-    
     setTables({
       resultsColumns: tables?.resultsColumns ?? [],
       compareColumns: tables?.compareColumns ?? []
     })
     setCompareResult(value)
   }
-
+  
   const [compareCurrentPosition, setCompareCurrentPosition,] = useState(0);
 
   return (
@@ -706,10 +714,10 @@ function compareModal(
           </li>
         )}
         />
-
+      
       <Table
       columns={tables?.compareColumns ?? []}
-      data={compareResult}
+      data={formatResult(compareResult)}
       viewportWidth={1000}
       viewportHeight={300}
       rowHeight={40}
@@ -747,6 +755,17 @@ function compareModal(
     }}
   />
   )
+}
+
+function formatResult(result:any[]) {
+  
+  result.map((v:any, i:number) => {
+    for (let i = 0; i < result[0].dbInfo.length; i++) { 
+      v["dbmsValue" + (i+1)] = v.dbInfo[i].dbmsValue
+    }
+    return v
+  })
+  return result
 }
 
 export default App;
